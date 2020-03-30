@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use('/users', user);
 app.use('/categories', category);
 app.use('/transactions', transaction);
-app.use('/transaction-types', transactionType);
+app.use('/transactiontypes', transactionType);
 
 const server = app.listen(PORT, () => {
     console.log(`Server started on port ${server.address().port}`);
