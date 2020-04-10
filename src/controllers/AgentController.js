@@ -1,7 +1,7 @@
-import User from '../models/User.js';
-import { UserRepository } from '../Repositories/UserRepository.js';
+import Agent from '../models/Agent.js';
+import { AgentRepository } from '../Repositories/AgentRepository.js';
 
-class UserController {
+class AgentController {
 
     constructor(pool) {
         this.get = this.get.bind(this);
@@ -9,39 +9,36 @@ class UserController {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
 
-        this.userRepository = new UserRepository(pool);
+        this.agentRepository = new AgentRepository(pool);
     }
 
     async get(request, response, next) {
-        response.json(await this.userRepository.getAllUsers());
+        response.json(await this.agentRepository.getAllAgents());
     }
 
     async create(request, response, next) {
 
         const name = request.body.name;
-        const email = request.body.email;
-        const password = request.body.password;
+        const user_id = request.body.user_id;
 
-        const user = await this.userRepository.createUser(name, email, password);
+        const agent = await this.agentRepository.createAgent(name, user_id);
 
-        response.send(user);
+        response.send(agent);
     }
 
     async update(request, response, next) {
 
         const id = Number(request.params.id);
         const name = request.body.name;
-        const email = request.body.email;
-        const password = request.body.password;
+        const user_id = request.body.user_id;
 
         try {
-            const user = await this.userRepository.updateUser({
+            const agent = await this.agentRepository.updateAgent({
                 id: id,
                 name: name,
-                email: email,
-                password: password
+                user_id: user_id
             });
-            response.json(user);
+            response.json(agent);
         } catch (e) {
             response.status(500).send(e.massage);
         }
@@ -51,7 +48,7 @@ class UserController {
         const id = Number(request.params.id);
 
         try {
-            await this.userRepository.deleteUser(id);
+            await this.agentRepository.deleteAgent(id);
             response.send('ok');
         } catch (e) {
             response.status(500).send(e.massage);
@@ -59,4 +56,4 @@ class UserController {
     }
 }
 
-export default UserController;
+export default AgentController;
