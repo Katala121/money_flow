@@ -1,14 +1,22 @@
-import express               from 'express';
+import express from 'express';
 import CategoryController from '../controllers/CategoryController.js';
-import CategoryRepository from '../Repositories/CategoryRepository.js';
 
-const router = express.Router();
+class CategoryRouter {
 
-const categoryController = new CategoryController(CategoryRepository);
+    _router = express.Router();
 
-router.route('/').get(categoryController.get);
-router.route('/').post(categoryController.create);
-router.route('/:id').put(categoryController.update);
-router.route('/:id').delete(categoryController.delete);
+    constructor(pool){
+        this._categoryController = new CategoryController(pool);
 
-export default router;
+        this._router.route('/').get(this._categoryController.get);
+        this._router.route('/').post(this._categoryController.create);
+        this._router.route('/:id').put(this._categoryController.update);
+        this._router.route('/:id').delete(this._categoryController.delete);
+    }
+
+    get router() {
+        return this._router;
+    }
+}
+
+export default CategoryRouter;

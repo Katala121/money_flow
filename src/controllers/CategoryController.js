@@ -1,69 +1,55 @@
 import Category from '../models/Category.js';
+import { CategoryRepository } from '../Repositories/CategoryRepository.js';
 
 class CategoryController {
 
-    constructor(categories) {
+    constructor(pool) {
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.listAll = this.listAll.bind(this);
 
-        this._categories = categories;
+        this.categoryRepository = new CategoryRepository(pool);
     }
 
-    get(request, response, next) {
-        response.json([...this._categories]);
+    async get(request, response, next) {
+        response.json(await this.categoryRepository.getAllCategories());
     }
 
-    create(request, response, next) {
+    async create(request, response, next) {
 
-        const id = this._categories.size + 1;
         const name = request.body.name;
 
-        const category = new Category(id, name);
-        this._categories.set(id, category);
+        const category = await this.categoryRepository.createCategory(name);
 
         response.send(category);
     }
 
-    update(request, response, next) {
+    async update(request, response, next) {
 
-        const id = request.params.id;
-        const category = this._categories.get(Number(id));
+        const id = Number(request.params.id);
+        const name = request.body.name;
 
-        if (category !== undefined) {
-            const name = request.body.name;
-            category.name = name;
-
-            this._categories.set(id, category);
+        try {
+            const category = await this.categoryRepository.updateCategory({
+                id: id,
+                name: name
+            });
             response.json(category);
-        } else {
-            throw new Error('Category not found');
+        } catch (e) {
+            response.status(500).send(e.massage);
         }
     }
 
-    delete(request, response, next) {
-        const id = request.params.id;
-        const category = this._categories.get(Number(id));
+    async delete(request, response, next) {
+        const id = Number(request.params.id);
 
-        if (category !== undefined) {
-            this._categories.delete(Number(id));
+        try {
+            await this.categoryRepository.deleteCategory(id);
             response.send('ok');
-        } else {
-            throw new Error('Category not found');
+        } catch (e) {
+            response.status(500).send(e.massage);
         }
-    }
-
-    listAll(request, response, next) {
-
-        const categories = [];
-
-        for (let cat of this._categories) {
-            categories.push(cat[1]);
-        }
-
-        response.render('index', {'categories': categories})
     }
 }
 
