@@ -26,6 +26,31 @@ export class TransactionRepository {
         return transactions;
     }
 
+    async getAllTransactionOfUser(user){
+        let transactionsUser = [];
+        const userId = user.id;
+
+        const agent = await this._pool.query('SELECT * FROM public."agent" WHERE user_id=$1;', [userId]);
+        const agentId = agent.rows[0].id;
+
+        const rawTransactions = await this._pool.query('SELECT * FROM public."transaction" WHERE source_agent_id=$1;', [agentId]);
+    
+        for (let rawTransaction of rawTransactions.rows) {
+            let transaction = new Transaction({
+                id: rawTransaction.id,
+                source_agent_id: rawTransaction.source_agent_id,
+                destination_agent_id: rawTransaction.destination_agent_id,
+                count: rawTransaction.count,
+                date: rawTransaction.date,
+                category_id: rawTransaction.category_id,
+                transaction_type: rawTransaction.transaction_type
+            });
+            transactionsUser.push(transaction);
+        }
+
+        return transactionsUser;
+    }
+
     async createTransaction(source_agent_id, destination_agent_id, count, date, category_id, transaction_type){
         const rawTransaction = await this._pool.query(
             'INSERT INTO public."transaction" (source_agent_id, destination_agent_id, count, date, category_id, transaction_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;'

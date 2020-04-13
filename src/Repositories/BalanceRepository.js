@@ -36,20 +36,11 @@ export class BalanceRepository {
         return balanceReturn;
     }
 
-    async updateBalance({id, balance, agent_id}) {
-        const rawBalance = await this._pool.query('UPDATE public."balance" set balance=$2, agent_id=$3 WHERE id=$1 RETURNING *;', [id, balance, agent_id]);
-
+    async updateBalance(balance, agent_id) {
+        const rawBalance = await this._pool.query('UPDATE public."balance" set balance=$1 WHERE agent_id=$2 RETURNING *;', [balance, agent_id]);
         if (rawBalance.rows.lenth === 0) {
             throw Error('Error on update balance');
         }
-
-        let balanceReturn = new Balance({
-            id : rawBalance.rows[0].id,
-            balance : rawBalance.rows[0].balance,
-            agent_id : rawBalance.rows[0].agent_id
-        });
-
-        return balanceReturn;
     }
 
     async deleteBalance(id){

@@ -1,10 +1,9 @@
 class User {
 
-    constructor({id, name, email, password}) {
+    constructor({id, name, email}) {
         this._id = id;
         this._name = name;
         this._email = email;
-        this._password = password;
     }
 
     get id() {
@@ -19,28 +18,24 @@ class User {
         return this._name;
     }
 
-    set email(newValue) {
-        this._email = newValue;
-    }
-
     get email() {
         return this._email;
-    }
-
-    set password(newValue) {
-        this._password = newValue;
     }
 
     get password() {
         return this._password;
     }
 
+    get token() {
+        return this._token;
+    }
+
     toJSON() {
         return {
             id: this.id,
-            name: this.name,
             email: this.email,
-            password: this.password
+            name: this.name,
+            token: this.token
         }
     }
 }
