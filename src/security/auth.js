@@ -1,11 +1,10 @@
-import { UserRepository } from "../Repositories/UserRepository.js";
-import jwt from 'jsonwebtoken';
-import pool from "../database.js";
+import jwt            from 'jsonwebtoken';
+import UserRepository from '../repositories/UserRepository.js';
+import pool           from '../database.js';
 
 const userRepository = new UserRepository(pool);
 
 async function checkUser(request, response, next) {
-
     if (request.headers.authorization !== undefined) {
         const token = request.headers.authorization.split(' ')[1];
 
@@ -14,10 +13,11 @@ async function checkUser(request, response, next) {
         const user = await userRepository.findByEmailAndId({
             id: decoded.id,
             email: decoded.email,
-        })
+        });
 
         if (user !== null && await jwt.verify(token, user.password) !== null) {
             request.user = user;
+            request.user.role = 'Admin';
 
             next();
         } else {

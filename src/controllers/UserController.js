@@ -1,75 +1,75 @@
-import {UserRepository} from "../Repositories/UserRepository.js";
-import { AgentRepository } from '../Repositories/AgentRepository.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import bcrypt                from 'bcryptjs';
+import jwt                   from 'jsonwebtoken';
+import UserRepository        from '../repositories/UserRepository.js';
+import AgentRepository       from '../repositories/AgentRepository.js';
+import TransactionRepository from '../repositories/TransactionRepository.js';
 
-class UsersController {
-
+class UserController {
     constructor(pool) {
-        this.get = this.get.bind(this);
+        this.getUser = this.getUser.bind(this);
         this.register = this.register.bind(this);
         this.login = this.login.bind(this);
         this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
-        this._pool = pool;
+        this.getBalance = this.getBalance.bind(this);
+        this.getUserTransactions = this.getUserTransactions.bind(this);
+        this.createUserTransactions = this.createUserTransactions.bind(this);
 
         this.userRepository = new UserRepository(pool);
         this.agentRepository = new AgentRepository(pool);
+        this.transactionRepository = new TransactionRepository(pool);
     }
 
-    async get(request, response, next) {
-        const userName = request.user._name;
-        const userId = request.user._id;
-        
-        const agent = await this._pool.query('SELECT * FROM public."agent" WHERE user_id=$1;', [userId]); 
-        const agent_id = agent.rows[0].id;
-        const rawBalance = await this._pool.query('SELECT * FROM public."balance" WHERE agent_id=$1;', [agent_id]);
-        const userBalance = rawBalance.rows[0].balance;
-        response.send(`${userName}, your balance: ${userBalance}`);
+    async getUser(request, response, next) {
+        const { id } = request.params;
+        const { user } = request;
+
+        if (user !== undefined && user.id === id) {
+            const balance = await this.userRepository.getUserBalance(user.id);
+
+            user._balance = balance;
+            response.json(user);
+        } else {
+            next(new Error('Invalid user information'));
+        }
     }
 
-    async register(request, response, next) {
-        const email = request.body.email;
-        const password = request.body.password;
-        const name = request.body.name;
+    async register(request, response) {
+        const { email } = request.body;
+        const { password } = request.body;
+        const { name } = request.body;
 
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
 
-        const user = await this.userRepository.save({email: email,name: name, password: hash});
+        const user = await this.userRepository.save({ email, name, password: hash });
 
-        await this.agentRepository.create({id: user.id, name: user.name});
+        await this.agentRepository.create({ id: user.id, name: user.name });
 
-        const token = jwt.sign({
+        user._token = jwt.sign({
             email: user.email,
             name: user.name,
-            id: user.id
+            id: user.id,
         }, hash, {
-            expiresIn: '24h'
+            expiresIn: '24h',
         });
 
-        user._token = token;
-
-        response.json(user)
+        response.json(user);
     }
 
     async login(request, response, next) {
-        const email = request.body.email;
-        const password = request.body.password;
+        const { email } = request.body;
+        const { password } = request.body;
 
-        const user = await this.userRepository.findByEmail({email: email});
+        const user = await this.userRepository.findByEmail({ email });
 
         if (bcrypt.compareSync(password, user.password) === true) {
-
-            const token = jwt.sign({
+            user._token = jwt.sign({
                 email: user.email,
                 name: user.name,
-                id: user.id
+                id: user.id,
             }, user.password, {
-                expiresIn: '24h'
+                expiresIn: '24h',
             });
-
-            user._token = token;
 
             response.json(user);
         } else {
@@ -78,12 +78,57 @@ class UsersController {
     }
 
     async update(request, response, next) {
-        response.send('Update user')
+        const { id } = request.params;
+        const { user } = request;
+        const { name } = request.body;
+
+        if (user !== undefined && user.id === id) {
+            const updatedUser = await this.userRepository.update(user, { name });
+            response.json(updatedUser);
+        } else {
+            next(new Error('Invalid user information'));
+        }
     }
 
-    async delete(request, response, next) {
-        response.send('Delete user')
+    async getBalance(request, response) {
+        const userId = request.params.id;
+
+        const balance = await this.userRepository.getUserBalance(userId);
+
+        response.send({ balance });
+    }
+
+    async getUserTransactions(request, response, next) {
+        const userId = request.params.id;
+        const { user } = request;
+        const params = request.query !== undefined ? request.query : {};
+
+        if (user !== undefined && user.id === userId) {
+            // eslint-disable-next-line max-len
+            const transactions = await this.transactionRepository.getTransactionByParams(userId, params);
+
+            response.json(transactions);
+        } else {
+            next(new Error('Invalid user information'));
+        }
+    }
+
+    async createUserTransactions(request, response, next) {
+        const {
+            agentName, count, categoryId, transactionType,
+        } = request.body;
+        const userId = request.params.id;
+        const { user } = request;
+
+        if (user !== undefined && user.id === userId) {
+            // eslint-disable-next-line max-len
+            const transaction = await this.transactionRepository.createTransaction(user, agentName, count, categoryId, transactionType);
+
+            response.json(transaction);
+        } else {
+            next(new Error('Invalid user information'));
+        }
     }
 }
 
-export default UsersController;
+export default UserController;

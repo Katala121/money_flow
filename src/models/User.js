@@ -1,6 +1,5 @@
 class User {
-
-    constructor({id, name, email}) {
+    constructor({ id, name, email }) {
         this._id = id;
         this._name = name;
         this._email = email;
@@ -10,12 +9,12 @@ class User {
         return this._id;
     }
 
-    set name(newValue) {
-        this._name = newValue;
-    }
-
     get name() {
         return this._name;
+    }
+
+    set name(newValue) {
+        this._name = newValue;
     }
 
     get email() {
@@ -35,8 +34,9 @@ class User {
             id: this.id,
             email: this.email,
             name: this.name,
-            token: this.token
-        }
+            token: this.token,
+            balance: this._balance !== undefined ? this._balance : 0,
+        };
     }
 }
 

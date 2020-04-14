@@ -6,20 +6,20 @@ class TransactionTypeController {
         this.delete = this.delete.bind(this);
     }
 
-    get(request, response, next) {
-        response.send('Get transactionType');
+    get(request, response) {
+        response.send('Get transaction type');
     }
 
-    create(request, response, next) {
-        response.send('Create transactionType');
+    create(request, response) {
+        response.send('Create transaction type');
     }
 
-    update(request, response, next) {
-        response.send('Update transactionType');
+    update(request, response) {
+        response.send('Update transaction type');
     }
 
-    delete(request, response, next) {
-        response.send('Delete transactionType');
+    delete(request, response) {
+        response.send('Delete transaction type');
     }
 }
 
