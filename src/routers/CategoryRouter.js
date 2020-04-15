@@ -1,5 +1,7 @@
 import express            from 'express';
 import CategoryController from '../controllers/CategoryController.js';
+// import auth           from '../security/auth.js';
+
 
 class CategoryRouter {
     constructor(pool) {
