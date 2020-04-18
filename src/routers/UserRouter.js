@@ -7,9 +7,9 @@ class UserRouter {
         this._router = express.Router();
         this._userController = new UserController(pool);
 
-        this._router.use('/:id', auth);
-        this._router.route('/:id').get(this._userController.getUser);
-        this._router.route('/:id').put(this._userController.update);
+        // this._router.use('/:id', auth);
+        this._router.route('/:id').get(auth, this._userController.getUser);
+        this._router.route('/:id').put(auth, this._userController.update);
 
         this._router.use('/:id/balance', auth);
         this._router.route('/:id/balance').get(this._userController.getBalance);

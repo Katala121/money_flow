@@ -13,19 +13,20 @@ class CategoryController {
     async get(request, response) {
         try {
             const allCategories = await this.categotyRepository.getAllCategories();
-            console.log(allCategories);
             response.json(allCategories);
         } catch (e) {
             response.status(500).send(e.message);
         }
     }
 
-    async create(request, response) {
-        const { name } = request.body;
-
-        const category = await this.categotyRepository.createCategory(name);
-
-        response.send(category);
+    async create(request, response, next) {
+        try {
+            const { name } = request.body;
+            const category = await this.categotyRepository.createCategory(name);
+            response.send(category);
+        } catch (e) {
+            next(new Error('Error on create category'));
+        }
     }
 
     async update(request, response) {
@@ -37,7 +38,7 @@ class CategoryController {
                 id,
                 name,
             });
-            response.json(category);
+            response.send(category);
         } catch (e) {
             response.status(500).send(e.message);
         }

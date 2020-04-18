@@ -6,19 +6,20 @@ class CategoryRepository {
     }
 
     async getAllCategories() {
-        const categories = [];
-
-        const rawCategories = await this._pool.query('SELECT * FROM public."category";');
-
-        rawCategories.rows.forEach((rawCategory) => {
-            const category = new Category({
-                id: rawCategory.id,
-                name: rawCategory.name,
+        try {
+            const categories = [];
+            const rawCategories = await this._pool.query('SELECT * FROM public."category";');
+            rawCategories.rows.forEach((rawCategory) => {
+                const category = new Category({
+                    id: rawCategory.id,
+                    name: rawCategory.name,
+                });
+                categories.push(category);
             });
-            categories.push(category);
-        });
-
-        return categories;
+            return categories;
+        } catch (e) {
+            throw new Error('Error on get categories');
+        }
     }
 
     async createCategory(name) {
@@ -26,6 +27,10 @@ class CategoryRepository {
             'INSERT INTO public."category" (name) VALUES ($1) RETURNING *;',
             [name],
         );
+
+        if (rawCategory.rows.length === 0) {
+            throw Error('Error on create category');
+        }
 
         return new Category({
             id: rawCategory.rows[0].id,
