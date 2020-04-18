@@ -11,7 +11,13 @@ class CategoryController {
     }
 
     async get(request, response) {
-        response.json(await this.categotyRepository.getAllCategories());
+        try {
+            const allCategories = await this.categotyRepository.getAllCategories();
+            console.log(allCategories);
+            response.json(allCategories);
+        } catch (e) {
+            response.status(500).send(e.message);
+        }
     }
 
     async create(request, response) {

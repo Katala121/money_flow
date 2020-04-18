@@ -17,7 +17,7 @@ async function checkUser(request, response, next) {
 
         if (user !== null && await jwt.verify(token, user.password) !== null) {
             request.user = user;
-            request.user.role = 'Admin';
+            // request.user.role = 'Admin';
 
             next();
         } else {
