@@ -39,7 +39,6 @@ CategoryRepository.mockImplementation(() => {
 
 describe('test categories route', () => {
     test('test categories GET method success answer', async () => {
-
         const categoryRouter = new CategoryRouter(pool);
 
         const res = await request(app.use('/api/categories', categoryRouter.router))
