@@ -2,6 +2,8 @@ import express from 'express';
 import request  from 'supertest';
 import CategoryRouter from '../../src/routers/CategoryRouter.js';
 import CategoryRepository from '../../src/repositories/CategoryRepository.js';
+import auth                     from '../../src/security/auth.js';
+import User                     from '../../src/models/User.js';
 
 const app = express();
 app.use(express.json());
@@ -9,9 +11,22 @@ app.use(express.json());
 const client = { query: jest.fn(), release: jest.fn() };
 const pool = { connect: jest.fn(() => client), query: jest.fn() };
 
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzIxMzk3NywiZXhwIjoxNTg3MzAwMzc3fQ.trwAZ2_yIV7UugtLUaQb36cQbSDhHIhC1YJl7PrRgDg';
+const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzMyNzA0MSwiZXhwIjoxNTg3NDEzNDQxfQ.d51gwmBTUKbe57Rz12pha0Puf5hcCwb6Xag-S2gi2qQ';
+
+const user = new User({
+    id: '2',
+    name: 'Alex',
+    email: 'adress@gmail.com',
+});
+user._password = '$2a$10$D8F6/EkCGPuMsM8SkSevKO7/AWNHeTo0hpxFdt5GZ7yGHWzvLgZxK';
 
 jest.mock('../../src/repositories/CategoryRepository.js');
+jest.mock('../../src/security/auth.js');
+
+auth.mockImplementation((request, response, next) => {
+    request.user = user;
+    next();
+});
 
 CategoryRepository.mockImplementation(() => {
     return {

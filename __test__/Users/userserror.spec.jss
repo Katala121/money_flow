@@ -14,7 +14,7 @@ app.use(express.json());
 const client = { query: jest.fn(), release: jest.fn() };
 const pool = { connect: jest.fn(() => client), query: jest.fn() };
 
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzIxMzk3NywiZXhwIjoxNTg3MzAwMzc3fQ.trwAZ2_yIV7UugtLUaQb36cQbSDhHIhC1YJl7PrRgDg';
+const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzMyNzA0MSwiZXhwIjoxNTg3NDEzNDQxfQ.d51gwmBTUKbe57Rz12pha0Puf5hcCwb6Xag-S2gi2qQ';
 
 const user = new User({
     id: '2',

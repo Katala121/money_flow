@@ -5,7 +5,6 @@ import path from 'path';
 import CategoryRouter from './routers/CategoryRouter.js';
 import pool           from './database.js';
 import UserRouter     from './routers/UserRouter.js';
-import auth           from './security/auth.js';
 
 const app = express();
 
@@ -26,7 +25,7 @@ const server = app.listen(PORT, async () => {
     app.use('/api/users', userRouter.router);
 
     const categoryRouter = new CategoryRouter(pool);
-    app.use('/api/categories', auth, categoryRouter.router);
+    app.use('/api/categories', categoryRouter.router);
 
     app.use((error, request, response) => {
         console.log(error.stack);
