@@ -31,7 +31,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/__test__/Categories/categories.spec.js"
+            "program": "${workspaceFolder}/__test__/Users/users.spec.js"
         },
 
         {

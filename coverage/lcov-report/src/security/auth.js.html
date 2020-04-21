@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60% </span>
+                <span class="strong">66.67% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/10</span>
+                <span class='fraction'>8/12</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60% </span>
+                <span class="strong">66.67% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/10</span>
+                <span class='fraction'>8/12</span>
             </div>
         
             
@@ -87,24 +87,30 @@
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -113,6 +119,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -124,26 +134,31 @@ import pool           from '../database.js';
 const userRepository = new UserRepository(pool);
 &nbsp;
 async function checkUser(request, response, next) {
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (request.headers.authorization !== undefined) {
-        const token = request.headers.authorization.split(' ')[1];
-&nbsp;
-        const decoded = await jwt.decode(token);
-&nbsp;
-        const user = await userRepository.findByEmailAndId({
-            id: decoded.id,
-            email: decoded.email,
-        });
-&nbsp;
-        if (user !== null &amp;&amp; await jwt.verify(token, user.password) !== null) {
-<span class="cstat-no" title="statement not covered" >            request.user = user;</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >            next();</span>
+    try {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (request.headers.authorization !== undefined) {
+            const token = request.headers.authorization.split(' ')[1];
+    
+            const decoded = await jwt.decode(token);
+    
+            const user = await userRepository.findByEmailAndId({
+                id: decoded.id,
+                email: decoded.email,
+            });
+    
+            if (user !== null &amp;&amp; await jwt.verify(token, user.password) !== null) {
+<span class="cstat-no" title="statement not covered" >                request.user = user;</span>
+    
+<span class="cstat-no" title="statement not covered" >                next();</span>
+            } else {
+<span class="cstat-no" title="statement not covered" >                next(new Error('Invalid auth data'));</span>
+            }
         } else {
 <span class="cstat-no" title="statement not covered" >            next(new Error('Invalid auth data'));</span>
         }
-    } else {
-<span class="cstat-no" title="statement not covered" >        next(new Error('Invalid auth data'));</span>
+    } catch (e) {
+        next(new Error('Invalid auth data'))
     }
+    
 }
 &nbsp;
 export default checkUser;
@@ -154,7 +169,7 @@ export default checkUser;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 20 2020 12:18:18 GMT+0300 (Москва, стандартное время)
+                at Tue Apr 21 2020 12:50:24 GMT+0300 (Москва, стандартное время)
             </div>
         </div>
         <script src="../../prettify.js"></script>

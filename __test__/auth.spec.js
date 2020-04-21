@@ -41,11 +41,28 @@ describe('test auth route', () => {
 
         const categoryRouter = new CategoryRouter(pool);
         const res = await request(app.use('/api/categories', auth))
-                                .get('/api/categories')
-                                .set('Authorization', token);
+            .get('/api/categories')
+            .set('Authorization', token);
 
         const response = res.user;
 
         expect(JSON.stringify(response)).toBe(JSON.stringify(user));
+    });
+
+    test('test AUTH method error answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                findByEmailAndId: () => {
+                    throw new Error('Error input data');
+                }
+            };
+        });
+
+        const categoryRouter = new CategoryRouter(pool);
+        const res = await request(app.use('/api/categories', auth))
+            .get('/api/categories')
+            .set('Authorization', token);
+
+        expect(res.statusCode).toBe(500);
     });
 });
