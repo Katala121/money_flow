@@ -1,9 +1,9 @@
-import express from 'express';
-import request  from 'supertest';
-import CategoryRouter from '../../src/routers/CategoryRouter.js';
-import CategoryRepository from '../../src/repositories/CategoryRepository.js';
-import auth                     from '../../src/security/auth.js';
-import User                     from '../../src/models/User.js';
+import express              from 'express';
+import request              from 'supertest';
+import CategoryRouter       from '../../src/routers/CategoryRouter.js';
+import CategoryRepository   from '../../src/repositories/CategoryRepository.js';
+import auth                 from '../../src/security/auth.js';
+import User                 from '../../src/models/User.js';
 
 const app = express();
 app.use(express.json());
@@ -28,61 +28,72 @@ auth.mockImplementation((request, response, next) => {
     next();
 });
 
-CategoryRepository.mockImplementation(() => {
-    return {
-        getAllCategories: () => {
-            throw Error('Error on get categories');
-        },
-        createCategory: () => {
-            throw Error('Error on create category');
-        },
-        updateCategory: () => {
-            throw Error('Error on update category');
-        },
-        deleteCategory: () => {
-            throw Error('Error on delete category');
-        },
-    };
-});
-
 describe('test categories route', () => {
     test('test categories GET method error answer', async () => {
+        CategoryRepository.mockImplementation(() => {
+            return {
+                getAllCategories: () => {
+                    throw Error('Error on get categories');
+                },
+            };
+        });
         const categoryRouter = new CategoryRouter(pool);
 
         const res = await request(app.use('/api/categories', categoryRouter.router))
-                                .get('/api/categories');
+            .get('/api/categories');
 
         expect(res.statusCode).toBe(500);
     });
 
     test('test categories POST method error answer', async () => {
+        CategoryRepository.mockImplementation(() => {
+            return {
+                createCategory: () => {
+                    throw Error('Error on create category');
+                },
+            };
+        });
         const categoryRouter = new CategoryRouter(pool);
 
         const res = await (await (await request(app.use('/api/categories', categoryRouter.router))
-                                                .post('/api/categories')
-                                                .send({"name": "any"})
-                                                .set('Authorization', token)));
+            .post('/api/categories')
+            .send({"name": "any"})
+            .set('Authorization', token)));
 
         expect(res.statusCode).toBe(500);
     });
 
     test('test categories PUT method error answer', async () => {
+        CategoryRepository.mockImplementation(() => {
+            return {
+                updateCategory: () => {
+                    throw Error('Error on update category');
+                },
+            };
+        });
         const categoryRouter = new CategoryRouter(pool);
 
         const res = await (await (await request(app.use('/api/categories', categoryRouter.router))
-                                                .put('/api/categories/2')
-                                                .send({"name": "any"})
-                                                .set('Authorization', token)));
+            .put('/api/categories/2')
+            .send({"name": "any"})
+            .set('Authorization', token)));
 
         expect(res.statusCode).toBe(500);
     });
 
     test('test categories DELETE method error answer', async () => {
+        CategoryRepository.mockImplementation(() => {
+            return {
+                deleteCategory: () => {
+                    throw Error('Error on delete category');
+                },
+            };
+        });
         const categoryRouter = new CategoryRouter(pool);
 
         const res = await (await (await request(app.use('/api/categories', categoryRouter.router))
-                                                .delete('/api/categories/2')
-                                                .set('Authorization', token)));
+            .delete('/api/categories/2')
+            .set('Authorization', token)));
 
         expect(res.statusCode).toBe(500);
     });

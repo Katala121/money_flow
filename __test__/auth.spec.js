@@ -21,23 +21,15 @@ user._password = '$2a$10$D8F6/EkCGPuMsM8SkSevKO7/AWNHeTo0hpxFdt5GZ7yGHWzvLgZxK';
 
 jest.mock('../src/repositories/UserRepository.js');
 
-UserRepository.mockImplementation(() => {
-    return {
-        findByEmailAndId: () => {
-            return user;
-        }
-    };
-});
-
 describe('test auth route', () => {
     test('test AUTH method success answer', async () => {
-        // UserRepository.mockImplementation(() => {
-        //     return {
-        //         findByEmailAndId: () => {
-        //             return user;
-        //         }
-        //     };
-        // });
+        UserRepository.mockImplementation(() => {
+            return {
+                findByEmailAndId: () => {
+                    return user;
+                }
+            };
+        });
 
         const categoryRouter = new CategoryRouter(pool);
         const res = await request(app.use('/api/categories', auth))

@@ -65,48 +65,20 @@ jest.mock('../../src/repositories/UserRepository.js');
 jest.mock('../../src/repositories/TransactionRepository.js');
 jest.mock('../../src/security/auth.js');
 
-AgentRepository.mockImplementation();
-
-TransactionRepository.mockImplementation(() => {
-    return {
-        getTransactionByParams: () => {
-            throw new Error('Error on get transactions');
-        },
-
-        createTransaction: () => {
-            throw new Error('Error on create transactions');
-        }
-    }
-});
-
 auth.mockImplementation((request, response, next) => {
     request.user = user;
     next();
 });
 
-UserRepository.mockImplementation(() => {
-    return {
-        getUserBalance: () => {
-            throw new Error('Invalid user information');
-        },
-        save: () => {
-            throw new Error('Invalid user information');
-        },
-        findByEmail: () => {
-            throw new Error('Invalid user information');
-        },
-        findByEmailAndId: () => {
-            return user;
-        },
-        update: () => {
-            throw new Error('Invalid user information');
-        },
-    };
-});
-
 describe('test users route', () => {
     test('test users GETUSER method error answer', async () => {
-
+        UserRepository.mockImplementation(() => {
+            return {
+                getUserBalance: () => {
+                    throw new Error('Invalid user information');
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users', userRouter.router))
@@ -117,6 +89,14 @@ describe('test users route', () => {
     });
 
     test('test users REGISTRATION method error answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                save: () => {
+                    throw new Error('Invalid user information');
+                },
+            };
+        });
+        AgentRepository.mockImplementation();
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users/register', userRouter.router))
@@ -130,6 +110,13 @@ describe('test users route', () => {
     });
 
     test('test users LOGIN method error answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                findByEmail: () => {
+                    throw new Error('Invalid user information');
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users/login', userRouter.router))
@@ -142,6 +129,13 @@ describe('test users route', () => {
     });
 
     test('test users UPDATE method error answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                update: () => {
+                    throw new Error('Invalid user information');
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users', userRouter.router))
@@ -153,7 +147,13 @@ describe('test users route', () => {
     });
 
     test('test users GETBALANCE method error answer', async () => {
-
+        UserRepository.mockImplementation(() => {
+            return {
+                getUserBalance: () => {
+                    throw new Error('Invalid user information');
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/balance', userRouter.router))
@@ -164,7 +164,13 @@ describe('test users route', () => {
     });
 
     test('test users GETUSERTRANSACTION method error answer', async () => {
-
+        TransactionRepository.mockImplementation(() => {
+            return {
+                getTransactionByParams: () => {
+                    throw new Error('Error on get transactions');
+                },
+            }
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))
@@ -175,7 +181,13 @@ describe('test users route', () => {
     });
 
     test('test users CREATEUSERTRANSACTIONS method error answer', async () => {
-
+        TransactionRepository.mockImplementation(() => {
+            return {
+                createTransaction: () => {
+                    throw new Error('Error on create transactions');
+                }
+            }
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))

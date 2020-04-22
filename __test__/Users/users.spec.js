@@ -65,47 +65,20 @@ jest.mock('../../src/repositories/UserRepository.js');
 jest.mock('../../src/repositories/TransactionRepository.js');
 jest.mock('../../src/security/auth.js');
 
-AgentRepository.mockImplementation();
-
-TransactionRepository.mockImplementation(() => {
-    return {
-        getTransactionByParams: () => {
-            return recievedTransactions;
-        },
-
-        createTransaction: () => {
-            return createdTransaction;
-        }
-    }
-});
-
 auth.mockImplementation((request, response, next) => {
     request.user = user;
     next();
 });
 
-UserRepository.mockImplementation(() => {
-    return {
-        getUserBalance: () => {
-            return 1000;
-        },
-        save: () => {
-            return userRegister;
-        },
-        findByEmail: () => {
-            return user;
-        },
-        findByEmailAndId: () => {
-            return user;
-        },
-        update: () => {
-            return user;
-        },
-    };
-});
-
 describe('test users route', () => {
     test('test users GETUSER method success answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                getUserBalance: () => {
+                    return 1000;
+                }
+            };
+        });
 
         const userRouter = new UserRouter(pool);
 
@@ -118,6 +91,15 @@ describe('test users route', () => {
     });
 
     test('test users REGISTRATION method success answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                save: () => {
+                    return userRegister;
+                },
+            };
+        });
+        AgentRepository.mockImplementation();
+
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users/register', userRouter.router))
@@ -133,6 +115,13 @@ describe('test users route', () => {
     });
 
     test('test users LOGIN method success answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                findByEmail: () => {
+                    return user;
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users/login', userRouter.router))
@@ -147,6 +136,13 @@ describe('test users route', () => {
     });
 
     test('test users UPDATE method success answer', async () => {
+        UserRepository.mockImplementation(() => {
+            return {
+                update: () => {
+                    return user;
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users', userRouter.router))
@@ -160,7 +156,13 @@ describe('test users route', () => {
     });
 
     test('test users GETBALANCE method success answer', async () => {
-
+        UserRepository.mockImplementation(() => {
+            return {
+                getUserBalance: () => {
+                    return 1000;
+                },
+            };
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/balance', userRouter.router))
@@ -172,7 +174,13 @@ describe('test users route', () => {
     });
 
     test('test users GETUSERTRANSACTION method success answer', async () => {
-
+        TransactionRepository.mockImplementation(() => {
+            return {
+                getTransactionByParams: () => {
+                    return recievedTransactions;
+                }
+            }
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))
@@ -184,7 +192,13 @@ describe('test users route', () => {
     });
 
     test('test users CREATEUSERTRANSACTIONS method success answer', async () => {
-
+        TransactionRepository.mockImplementation(() => {
+            return {
+                createTransaction: () => {
+                    return createdTransaction;
+                }
+            }
+        });
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))
