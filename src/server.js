@@ -1,6 +1,5 @@
 import process        from 'process';
 import express        from 'express';
-import io from 'socket.io';
 import path from 'path';
 import CategoryRouter from './routers/CategoryRouter.js';
 import pool           from './database.js';
