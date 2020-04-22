@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" />
     <title>Chat App</title>
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.2.0/dist/socket.io.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body class="bg-gray-900 flex justify-center mb-32">
@@ -48,29 +49,35 @@
         console.log('connected')
     });
 
-    socket.on('newEvent', message => {
-        alert(message);
-    })
-
     //Just creating a new element for our message and appending it to the chat and re-enabling the send button.
     socket.on('showMessage', message => {
         const newMessage = document.createElement('div')
         const user = document.createElement('h3')
         const text = document.createElement('p')
 
-        var img = document.createElement("img");
-        img.src = message.message;
-
-
+        const link = /^http/;
+        const receivedMessage = message.message;
         newMessage.classList.add('flex', 'items-center', 'mt-5')
         user.classList.add('bg-blue-600', 'p-3', 'mr-10', 'w-40', 'rounded', 'self-start')
         user.innerHTML = message.name
-        text.classList.add('w-4/5')
-        text.innerHTML = message.message
-
         newMessage.appendChild(user)
-        newMessage.appendChild(text)
-        newMessage.appendChild(img)
+        text.classList.add('w-4/5')
+        if (receivedMessage.match(link)) {
+            let request = new XMLHttpRequest();
+            request.open('HEAD', receivedMessage);
+            request.onreadystatechange = function () {
+                if (this.readyState == this.DONE) {
+                    console.log(this.status);
+                    console.log(this.getResponseHeader("Content-Type"));
+                }
+            };
+            var img = document.createElement("img");
+            img.src = receivedMessage;            
+            newMessage.appendChild(img)
+        } else {
+            text.innerHTML = receivedMessage;
+            newMessage.appendChild(text);
+        }
         chat.appendChild(newMessage)
 
         //Undisable button after message is received

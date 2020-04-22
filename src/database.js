@@ -8,4 +8,4 @@ const pool = new pg.Pool({
     port: 5432,
 });
 
-export default pool;mockImplementation
+export default pool;
