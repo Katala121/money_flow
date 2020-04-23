@@ -1,15 +1,21 @@
-import express              from 'express';
-import request              from 'supertest';
-import CategoryRouter       from '../../src/routers/CategoryRouter.js';
-import CategoryRepository   from '../../src/repositories/CategoryRepository.js';
-import auth                 from '../../src/security/auth.js';
-import User                 from '../../src/models/User.js';
+import express            from 'express';
+import request            from 'supertest';
+import CategoryRouter     from '../../src/routers/CategoryRouter.js';
+import CategoryRepository from '../../src/repositories/CategoryRepository.js';
+import auth               from '../../src/security/auth.js';
+import User               from '../../src/models/User.js';
 
 const app = express();
 app.use(express.json());
 
-const client = { query: jest.fn(), release: jest.fn() };
-const pool = { connect: jest.fn(() => client), query: jest.fn() };
+const client = {
+    query: jest.fn(),
+    release: jest.fn()
+};
+const pool = {
+    connect: jest.fn(() => client),
+    query: jest.fn()
+};
 
 const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzMyNzA0MSwiZXhwIjoxNTg3NDEzNDQxfQ.d51gwmBTUKbe57Rz12pha0Puf5hcCwb6Xag-S2gi2qQ';
 
@@ -42,7 +48,8 @@ describe('test categories route', () => {
         const res = await request(app.use('/api/categories', categoryRouter.router))
             .get('/api/categories');
 
-        expect(res.statusCode).toBe(500);
+        expect(res.statusCode)
+            .toBe(500);
     });
 
     test('test categories POST method error answer', async () => {
@@ -57,10 +64,11 @@ describe('test categories route', () => {
 
         const res = await (await (await request(app.use('/api/categories', categoryRouter.router))
             .post('/api/categories')
-            .send({"name": "any"})
+            .send({ 'name': 'any' })
             .set('Authorization', token)));
 
-        expect(res.statusCode).toBe(500);
+        expect(res.statusCode)
+            .toBe(500);
     });
 
     test('test categories PUT method error answer', async () => {
@@ -75,10 +83,11 @@ describe('test categories route', () => {
 
         const res = await (await (await request(app.use('/api/categories', categoryRouter.router))
             .put('/api/categories/2')
-            .send({"name": "any"})
+            .send({ 'name': 'any' })
             .set('Authorization', token)));
 
-        expect(res.statusCode).toBe(500);
+        expect(res.statusCode)
+            .toBe(500);
     });
 
     test('test categories DELETE method error answer', async () => {
@@ -95,6 +104,7 @@ describe('test categories route', () => {
             .delete('/api/categories/2')
             .set('Authorization', token)));
 
-        expect(res.statusCode).toBe(500);
+        expect(res.statusCode)
+            .toBe(500);
     });
 });

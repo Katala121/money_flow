@@ -1,18 +1,23 @@
-import express                  from 'express';
-import request                  from 'supertest';
-import UserRouter               from '../../src/routers/UserRouter.js';
-import UserRepository           from '../../src/repositories/UserRepository.js';
-import AgentRepository          from '../../src/repositories/AgentRepository.js';
-import TransactionRepository    from '../../src/repositories/TransactionRepository.js';
-import User                     from '../../src/models/User.js';
-import auth                     from '../../src/security/auth.js';
+import express               from 'express';
+import request               from 'supertest';
+import UserRouter            from '../../src/routers/UserRouter.js';
+import UserRepository        from '../../src/repositories/UserRepository.js';
+import TransactionRepository from '../../src/repositories/TransactionRepository.js';
+import User                  from '../../src/models/User.js';
+import auth                  from '../../src/security/auth.js';
 
 
 const app = express();
 app.use(express.json());
 
-const client = { query: jest.fn(), release: jest.fn() };
-const pool = { connect: jest.fn(() => client), query: jest.fn() };
+const client = {
+    query: jest.fn(),
+    release: jest.fn(),
+};
+const pool = {
+    connect: jest.fn(() => client),
+    query: jest.fn(),
+};
 
 const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkcmVzc0BnbWFpbC5jb20iLCJuYW1lIjoiQWxleCIsImlkIjoiMiIsImlhdCI6MTU4NzMyNzA0MSwiZXhwIjoxNTg3NDEzNDQxfQ.d51gwmBTUKbe57Rz12pha0Puf5hcCwb6Xag-S2gi2qQ';
 
@@ -26,38 +31,38 @@ user._password = '$2a$10$D8F6/EkCGPuMsM8SkSevKO7/AWNHeTo0hpxFdt5GZ7yGHWzvLgZxK';
 const userRegister = new User({
     id: '7',
     name: 'John',
-    email: 'testuser@test.com'
+    email: 'testuser@test.com',
 });
 
 const createdTransaction = {
-    "id": "30",
-    "source_agent_name": "Alex_2",
-    "destination_agent_name": "2",
-    "count": "300,00 ₽",
-    "date": "2020-04-18T21:00:00.000Z",
-    "transaction_type": "outgoing",
-    "category_name": "Продукты"
+    id: '30',
+    source_agent_name: 'Alex_2',
+    destination_agent_name: '2',
+    count: '300,00 ₽',
+    date: '2020-04-18T21:00:00.000Z',
+    transaction_type: 'outgoing',
+    category_name: 'Продукты',
 };
 
 const recievedTransactions = [
     {
-        "id": "4",
-        "source_agent_name": "Alex",
-        "destination_agent_name": "Alex",
-        "count": "100,00 ₽",
-        "date": "2020-04-11T21:00:00.000Z",
-        "transaction_type": "outgoing",
-        "category_name": "Продукты"
+        id: '4',
+        source_agent_name: 'Alex',
+        destination_agent_name: 'Alex',
+        count: '100,00 ₽',
+        date: '2020-04-11T21:00:00.000Z',
+        transaction_type: 'outgoing',
+        category_name: 'Продукты',
     },
     {
-        "id": "5",
-        "source_agent_name": "Alex",
-        "destination_agent_name": "Alex",
-        "count": "100,00 ₽",
-        "date": "2020-04-11T21:00:00.000Z",
-        "transaction_type": "outgoing",
-        "category_name": "Продукты"
-    }
+        id: '5',
+        source_agent_name: 'Alex',
+        destination_agent_name: 'Alex',
+        count: '100,00 ₽',
+        date: '2020-04-11T21:00:00.000Z',
+        transaction_type: 'outgoing',
+        category_name: 'Продукты',
+    },
 ];
 
 jest.mock('../../src/repositories/AgentRepository.js');
@@ -72,13 +77,9 @@ auth.mockImplementation((request, response, next) => {
 
 describe('test users route', () => {
     test('test users GETUSER method success answer', async () => {
-        UserRepository.mockImplementation(() => {
-            return {
-                getUserBalance: () => {
-                    return 1000;
-                }
-            };
-        });
+        UserRepository.mockImplementation(() => ({
+            getUserBalance: () => 1000,
+        }));
 
         const userRouter = new UserRouter(pool);
 
@@ -87,82 +88,72 @@ describe('test users route', () => {
             .set('Authorization', token);
 
         const response = res.body.balance;
-        expect(response).toBe(1000);
+        expect(response)
+            .toBe(1000);
     });
 
     test('test users REGISTRATION method success answer', async () => {
-        UserRepository.mockImplementation(() => {
-            return {
-                save: () => {
-                    return userRegister;
-                },
-            };
-        });
-        AgentRepository.mockImplementation();
+        UserRepository.mockImplementation(() => ({
+            save: () => userRegister,
+        }));
 
         const userRouter = new UserRouter(pool);
 
-        const res = await (await (await request(app.use('/api/users/register', userRouter.router))
+        const res = await request(app.use('/api/users/register', userRouter.router))
             .post('/api/users/register')
-            .send({"name": "any",
-                "email": "any",
-                "password": 'any'})
-            .set('Authorization', token)));
+            .send({
+                name: 'any',
+                email: 'any',
+                password: 'any',
+            });
 
         const response = res.body;
-        
-        expect(JSON.stringify(response)).toBe(JSON.stringify(userRegister));
+
+        expect(JSON.stringify(response))
+            .toBe(JSON.stringify(userRegister));
     });
 
     test('test users LOGIN method success answer', async () => {
-        UserRepository.mockImplementation(() => {
-            return {
-                findByEmail: () => {
-                    return user;
-                },
-            };
-        });
+        UserRepository.mockImplementation(() => ({
+            findByEmail: () => user,
+        }));
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users/login', userRouter.router))
             .post('/api/users/login')
-            .send({"email": "any",
-                "password": "12345"})
+            .send({
+                email: 'any',
+                password: '12345',
+            })
             .set('Authorization', token)));
 
         const response = res.body;
 
-        expect(JSON.stringify(response)).toBe(JSON.stringify(user));
+        expect(JSON.stringify(response))
+            .toBe(JSON.stringify(user));
     });
 
     test('test users UPDATE method success answer', async () => {
-        UserRepository.mockImplementation(() => {
-            return {
-                update: () => {
-                    return user;
-                },
-            };
-        });
+        UserRepository.mockImplementation(() => ({
+            update: () => user,
+        }));
         const userRouter = new UserRouter(pool);
 
         const res = await (await (await request(app.use('/api/users', userRouter.router))
             .put('/api/users/2')
-            .send({"name": "any"})
+            .send({ name: 'any' })
             .set('Authorization', token)));
 
         const response = res.body;
 
-        expect(JSON.stringify(response)).toBe(JSON.stringify(user));
+        expect(JSON.stringify(response))
+            .toBe(JSON.stringify(user));
     });
 
     test('test users GETBALANCE method success answer', async () => {
-        UserRepository.mockImplementation(() => {
-            return {
-                getUserBalance: () => {
-                    return 1000;
-                },
-            };
-        });
+        UserRepository.mockImplementation(() => ({
+            getUserBalance: () => 1000,
+        }));
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/balance', userRouter.router))
@@ -170,17 +161,14 @@ describe('test users route', () => {
             .set('Authorization', token);
 
         const response = res.body.balance;
-        expect(response).toBe(1000);
+        expect(response)
+            .toBe(1000);
     });
 
     test('test users GETUSERTRANSACTION method success answer', async () => {
-        TransactionRepository.mockImplementation(() => {
-            return {
-                getTransactionByParams: () => {
-                    return recievedTransactions;
-                }
-            }
-        });
+        TransactionRepository.mockImplementation(() => ({
+            getTransactionByParams: () => recievedTransactions,
+        }));
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))
@@ -188,28 +176,28 @@ describe('test users route', () => {
             .set('Authorization', token);
 
         const response = res.body;
-        expect(JSON.stringify(response)).toBe(JSON.stringify(recievedTransactions));
+        expect(JSON.stringify(response))
+            .toBe(JSON.stringify(recievedTransactions));
     });
 
     test('test users CREATEUSERTRANSACTIONS method success answer', async () => {
-        TransactionRepository.mockImplementation(() => {
-            return {
-                createTransaction: () => {
-                    return createdTransaction;
-                }
-            }
-        });
+        TransactionRepository.mockImplementation(() => ({
+            createTransaction: () => createdTransaction,
+        }));
         const userRouter = new UserRouter(pool);
 
         const res = await request(app.use('/api/users/:id/transactions', userRouter.router))
             .post('/api/users/2/transactions')
-            .send({"agentName": "any",
-                "count": "any",
-                "categoryId": "any",
-                "transactionType": "any"})
+            .send({
+                agentName: 'any',
+                count: 'any',
+                categoryId: 'any',
+                transactionType: 'any',
+            })
             .set('Authorization', token);
 
         const response = res.body;
-        expect(JSON.stringify(response)).toBe(JSON.stringify(createdTransaction));
+        expect(JSON.stringify(response))
+            .toBe(JSON.stringify(createdTransaction));
     });
 });

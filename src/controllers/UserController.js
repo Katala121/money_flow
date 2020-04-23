@@ -44,9 +44,16 @@ class UserController {
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(password, salt);
 
-            const user = await this.userRepository.save({ email, name, password: hash });
+            const user = await this.userRepository.save({
+                email,
+                name,
+                password: hash,
+            });
 
-            await this.agentRepository.create({ id: user.id, name: user.name });
+            await this.agentRepository.create({
+                id: user.id,
+                name: user.name,
+            });
 
             user._token = jwt.sign({
                 email: user.email,

@@ -15,7 +15,8 @@ class CategoryController {
             const allCategories = await this.categotyRepository.getAllCategories();
             response.json(allCategories);
         } catch (e) {
-            response.status(500).send(e.message);
+            response.status(500)
+                .send(e.message);
         }
     }
 
@@ -40,7 +41,8 @@ class CategoryController {
             });
             response.send(category);
         } catch (e) {
-            response.status(500).send(e.message);
+            response.status(500)
+                .send(e.message);
         }
     }
 
@@ -51,7 +53,8 @@ class CategoryController {
             await this.categotyRepository.deleteCategory(id);
             response.send('ok');
         } catch (e) {
-            response.status(500).send(e.message);
+            response.status(500)
+                .send(e.message);
         }
     }
 }

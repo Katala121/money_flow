@@ -34,7 +34,7 @@ class UserRepository {
         return user;
     }
 
-    async findByEmailAndId({ id, email }) {
+    async findByEmailAndId(id, email) {
         const userRawData = await this._pool.query(
             'SELECT * FROM public."user" where id=$1 AND email=$2;',
             [id, email],

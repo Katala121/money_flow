@@ -1,6 +1,6 @@
 import process        from 'process';
 import express        from 'express';
-import path from 'path';
+import path           from 'path';
 import CategoryRouter from './routers/CategoryRouter.js';
 import pool           from './database.js';
 import UserRouter     from './routers/UserRouter.js';
@@ -28,6 +28,7 @@ const server = app.listen(PORT, async () => {
 
     app.use((error, request, response) => {
         console.log(error.stack);
-        response.status(500).send(error.message);
+        response.status(500)
+            .send(error.message);
     });
 });
