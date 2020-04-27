@@ -18,8 +18,8 @@ const server = app.listen(PORT, async () => {
     app.use(express.json());
     app.use(express.raw());
 
-    const __dirname = path.resolve();
-    app.use(express.static(path.join(__dirname, './public')));
+    // const __dirname = path.resolve();
+    // app.use(express.static(path.join(__dirname, './public')));
 
     // const userRouter = new UserRouter(pool);
     // app.use('/api/users', userRouter.router);
@@ -36,6 +36,17 @@ const server = app.listen(PORT, async () => {
 
 const socketServer = io.listen(server);
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, './public')));
+
+socketServer.use((socket, next) => {
+    let token = socket.handshake.query.token;
+    if(token == 'abc') {
+        return next();
+    } else {
+       return next(new Error('Invalid auth data'));
+    }
+});
 
 socketServer.on('connection', (socket) => {
     socket.broadcast.emit('showMessage', { name: 'Anonymous', message: 'A NEW USER HAS JOINED' });
