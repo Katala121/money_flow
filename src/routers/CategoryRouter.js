@@ -1,11 +1,12 @@
-import express from 'express';
+import express            from 'express';
 import CategoryController from '../controllers/CategoryController.js';
+// import auth           from '../security/auth.js';
+
 
 class CategoryRouter {
+    constructor(pool) {
+        this._router = express.Router();
 
-    _router = express.Router();
-
-    constructor(pool){
         this._categoryController = new CategoryController(pool);
 
         this._router.route('/').get(this._categoryController.get);
